@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  env: dev
+redis:
+  host: redis
+  port: 6379
+  password: syntong
+oracle:
+  url: 10.1.3.110
+  port: 1521
+  sid: syntong
+  username: school
+  password: school_passwd
+tsm:
+  url: http://10.1.3.120:8899/onecard/uap/gateway.action
+# 虚拟卡开户配置信息
+openacc:
+  # 默认学校代码
+  defaultschoolcode: "001"
+  # 默认开户部门 106111 外来人员
+  defaultdeptcode: "106111"
+  # 默认身份代码 06 外来人员
+  defaultpidcode: "06"
