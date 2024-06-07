@@ -613,18 +613,12 @@ func (c *Client) OpenAcc(ctx context.Context, token string,
 	}
 	if resp.OpenAcc.Retcode != "0" {
 		return 0, errors.New(resp.OpenAcc.Errmsg)
-	} else {
-		//当学号重复时，不会返回错误，只会返回学号在一卡通中存在
-		if resp.OpenAcc.Errmsg == "此卡片的学工号在一卡通存在" {
-			return 0, errors.New(resp.OpenAcc.Errmsg)
-		} else {
-			acc, err := strconv.Atoi(resp.OpenAcc.Account)
-			if err != nil {
-				return 0, err
-			}
-			return int64(acc), nil
-		}
 	}
+	acc, err := strconv.Atoi(resp.OpenAcc.Account)
+	if err != nil {
+		return 0, err
+	}
+	return int64(acc), nil
 
 }
 
