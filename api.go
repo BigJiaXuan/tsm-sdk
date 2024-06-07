@@ -550,7 +550,7 @@ func (c *Client) OpenAcc(ctx context.Context, token string,
 		Phone      string `json:"phone"`
 		Email      string `json:"email"`
 		SchoolCode string `json:"schoolcode"`
-		DeptCode   string `json:"deptcode"`
+		DeptCode   string `json:"depcode"`
 		CardType   string `json:"cardtype"`
 		Born       string `json:"born"`
 		PidCode    string `json:"pidcode"`
