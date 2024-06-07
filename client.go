@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-module/dongle"
-	"go.uber.org/zap"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 	"io"
@@ -20,7 +19,6 @@ import (
 type Client struct {
 	config *Config
 	cipher *dongle.Cipher
-	logger *zap.Logger
 }
 
 type Config struct {
@@ -38,20 +36,6 @@ func NewClient(config *Config) *Client {
 		cipher: newCipher(config.TDes),
 	}
 }
-
-//func NewClient(URL string, secretKey SecretKey) *Client {
-//	return &Client{
-//		URL:       URL,
-//		SecretKey: secretKey,
-//		cipher:    newCipher(secretKey.TDes),
-//	}
-//}
-
-//// SetLogger 设置日志
-//func (c *Client) SetLogger(logger *zap.Logger) *Client {
-//	c.logger = logger
-//	return c
-//}
 
 func (c *Client) DoRequest(ctx context.Context, method, accessToken, request string) (response string, err error) {
 	timestamp := time.Now().Local().Format("2006-01-02 15:04:05")
@@ -71,7 +55,6 @@ func (c *Client) DoRequest(ctx context.Context, method, accessToken, request str
 		v,
 		requested)
 	if err != nil {
-		//c.logger.Error("TSM sign 加密失败", zap.Error(err))
 		return "", fmt.Errorf("加密sign参数失败：%v", err)
 	}
 
@@ -85,7 +68,6 @@ func (c *Client) DoRequest(ctx context.Context, method, accessToken, request str
 	formData.Set("sign", sign)
 	formData.Set("sign_method", signMethod)
 	formData.Set("request", requested)
-	c.logger.Info("TSM request 表单", zap.Any("formData", formData))
 	// 发送请求
 	req, err := http.NewRequestWithContext(ctx, "POST", c.config.URL, strings.NewReader(formData.Encode()))
 	if err != nil {
