@@ -61,7 +61,7 @@ func (c *Client) EncryptSignParam(access_token, app_key, method, format, signMet
 	sign := builder.String()
 
 	// 使用rsa-sha1 进行私钥签名
-	data := c.signatureSign(sign, c.SvrPkcs8)
+	data := c.signatureSign(sign, c.config.SvrPkcs8)
 	//fmt.Println("签名后的sign", data)
 	return data, nil
 }

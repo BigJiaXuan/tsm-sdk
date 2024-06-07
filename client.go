@@ -18,12 +18,13 @@ import (
 )
 
 type Client struct {
-	URL string
-	SecretKey
+	config *Config
 	cipher *dongle.Cipher
 	logger *zap.Logger
 }
-type SecretKey struct {
+
+type Config struct {
+	URL        string
 	TDes       string
 	AppKey     string
 	SvrPkcs8   string
@@ -31,54 +32,54 @@ type SecretKey struct {
 	TsmPublic  string
 }
 
-func NewClient(URL string, secretKey SecretKey) *Client {
+func NewClient(config *Config) *Client {
 	return &Client{
-		URL:       URL,
-		SecretKey: secretKey,
-		cipher:    newCipher(secretKey.TDes),
+		config: config,
+		cipher: newCipher(config.TDes),
 	}
 }
 
-// SetLogger 设置日志
-func (c *Client) SetLogger(logger *zap.Logger) *Client {
-	c.logger = logger
-	return c
-}
+//func NewClient(URL string, secretKey SecretKey) *Client {
+//	return &Client{
+//		URL:       URL,
+//		SecretKey: secretKey,
+//		cipher:    newCipher(secretKey.TDes),
+//	}
+//}
+
+//// SetLogger 设置日志
+//func (c *Client) SetLogger(logger *zap.Logger) *Client {
+//	c.logger = logger
+//	return c
+//}
+
 func (c *Client) DoRequest(ctx context.Context, method, accessToken, request string) (response string, err error) {
-	startTime := time.Now().Local().UnixMilli()
 	timestamp := time.Now().Local().Format("2006-01-02 15:04:05")
 	v := "2.0"
 	signMethod := "rsa"
 	format := "json"
 	// 加密request参数
 	requested := c.EncryptRequestParam(request)
-	c.logger.Info("TSM request 原始数据", zap.String("request", request))
-	c.logger.Debug("TSM request 加密后", zap.String("request", requested))
+
 	sign, err := c.EncryptSignParam(
 		accessToken,
-		c.SecretKey.AppKey,
+		c.config.AppKey,
 		method,
 		format,
 		signMethod,
 		timestamp,
 		v,
 		requested)
-	c.logger.Info("TSM sign 原始数据", zap.String("access_token", accessToken),
-		zap.String("appkey", c.SecretKey.AppKey), zap.String("method", method),
-		zap.String("format", format), zap.String("sign_method", signMethod),
-		zap.String("timestamp", timestamp), zap.String("v", v),
-		zap.String("request", requested))
-	c.logger.Debug("TSM sign 加密后", zap.String("sign", sign))
 	if err != nil {
-		c.logger.Error("TSM sign 加密失败", zap.Error(err))
-		return
+		//c.logger.Error("TSM sign 加密失败", zap.Error(err))
+		return "", fmt.Errorf("加密sign参数失败：%v", err)
 	}
 
 	formData := url.Values{}
 	formData.Set("method", method)
 	formData.Set("timestamp", timestamp)
 	formData.Set("format", "json")
-	formData.Set("app_key", c.SecretKey.AppKey)
+	formData.Set("app_key", c.config.AppKey)
 	formData.Set("access_token", accessToken)
 	formData.Set("v", v)
 	formData.Set("sign", sign)
@@ -86,10 +87,9 @@ func (c *Client) DoRequest(ctx context.Context, method, accessToken, request str
 	formData.Set("request", requested)
 	c.logger.Info("TSM request 表单", zap.Any("formData", formData))
 	// 发送请求
-	req, err := http.NewRequestWithContext(ctx, "POST", c.URL, strings.NewReader(formData.Encode()))
+	req, err := http.NewRequestWithContext(ctx, "POST", c.config.URL, strings.NewReader(formData.Encode()))
 	if err != nil {
-		c.logger.Error("TSM 构造http请求失败", zap.Error(err))
-		return "", err
+		return "", fmt.Errorf("构造http请求失败：%v", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
@@ -97,22 +97,20 @@ func (c *Client) DoRequest(ctx context.Context, method, accessToken, request str
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		c.logger.Error("TSM 发送http请求失败", zap.Error(err))
-		return "", err
+		return "", fmt.Errorf("发送http请求失败：%v", err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 
 	if err != nil {
-		c.logger.Error("TSM 读取http请求的响应失败", zap.Error(err))
-		return "", err
+		return "", fmt.Errorf("读取请求的响应失败：%v", err)
 	}
 
 	// 先解码 URL编码的字符串
 	data, err := url.PathUnescape(string(body))
 	if err != nil {
-		c.logger.Error("TSM URL编码解码失败", zap.Error(err))
-		return "", err
+		//c.logger.Error("TSM URL编码解码失败", zap.Error(err))
+		return "", fmt.Errorf("URL 解码失败：%v", err)
 	}
 
 	// 可能会出现直接返回错误信息的情况
@@ -121,32 +119,31 @@ func (c *Client) DoRequest(ctx context.Context, method, accessToken, request str
 		// 返回的response gbk转utf8
 		toUtf8, err := gbkToUtf8([]byte(data))
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("GBK转UTF8失败：%v", err)
 		}
-		c.logger.Error("TSM 返回的不是标准信息，直接返回内容", zap.Error(fmt.Errorf(string(toUtf8))))
+		//c.logger.Error("TSM 返回的不是标准信息，直接返回内容", zap.Error(fmt.Errorf(string(toUtf8))))
 		return "", errors.New(string(toUtf8))
 	}
-	c.logger.Debug("TSM 返回的数据 解码前", zap.String("data", data))
+	//c.logger.Debug("TSM 返回的数据 解码前", zap.String("data", data))
 	// 解析response
 	parseResponse, err := c.parseResponse(data)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("解密response失败：%v", err)
 	}
 
 	// 判断tsm的状态码
 	if parseResponse.ErrCode != 0 {
 		// 获取错误信息
 		errMsg := GetErrorMessage(parseResponse.ErrCode)
-		c.logger.Error("TSM 处理请求失败", zap.Error(errors.New(errMsg)))
-		return parseResponse.Request, fmt.Errorf("TSM 错误信息：%s", errMsg)
+		//c.logger.Error("TSM 处理请求失败", zap.Error(errors.New(errMsg)))
+		return parseResponse.Request, fmt.Errorf("TSM 返回错误：%s", errMsg)
 	}
 	// 解密request
 
 	decryptedResp := c.DecryptRequestParam(parseResponse.Request)
-	c.logger.Info("TSM 返回的数据 解码后", zap.Any("ErrCode", parseResponse.ErrCode), zap.Any("Request", decryptedResp))
-	endTime := time.Now().Local().UnixMilli()
-	useTime := endTime - startTime
-	c.logger.Info("TSM 请求耗时", zap.String("耗时", fmt.Sprintf("%d毫秒", useTime)))
+	//c.logger.Info("TSM 返回的数据 解码后", zap.Any("ErrCode", parseResponse.ErrCode), zap.Any("Request", decryptedResp))
+
+	//c.logger.Info("TSM 请求耗时", zap.String("耗时", fmt.Sprintf("%d毫秒", useTime)))
 	return decryptedResp, nil
 }
 
