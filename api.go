@@ -16,7 +16,7 @@ import (
 //	@param ctx
 //	@return string token
 //	@return error
-func (c *Client) GetAccessToken(ctx context.Context) (string, error) {
+func (c *client) GetAccessToken(ctx context.Context) (string, error) {
 	accessToken := "0000000000000000000000000000000000000000000000000000000000000000" +
 		"0000000000000000000000000000000000000000000000000000000000000000"
 	method := "synjones.authorize.access_token"
@@ -57,7 +57,7 @@ func (c *Client) GetAccessToken(ctx context.Context) (string, error) {
 //		@param getSchCode 是否获取核算单位 0:不获取 1:获取
 //		@param getCardId 是否获取物理卡号 0:不获取 1:获取
 //	    @return []models.Card
-func (c *Client) QueryCard(ctx context.Context, token string,
+func (c *client) QueryCard(ctx context.Context, token string,
 	idType string, id string, pwd string) ([]models.Card, error) {
 	accessToken := token
 	method := "synjones.onecard.query.card"
@@ -113,7 +113,7 @@ func (c *Client) QueryCard(ctx context.Context, token string,
 //	@param accType 电子账户类型 ###:为卡账户 其他为电子账户类型 为空时返回所有电子账户
 //	@return []models.AccInfo
 //	@return error
-func (c *Client) QueryAccInfo(ctx context.Context, token string,
+func (c *client) QueryAccInfo(ctx context.Context, token string,
 	account string, accType string) ([]models.AccInfo, error) {
 	accessToken := token
 	method := "synjones.onecard.query.accinfo"
@@ -157,7 +157,7 @@ func (c *Client) QueryAccInfo(ctx context.Context, token string,
 //	@param accType 电子账户类型
 //	@return models.QueryAccinfoTotal
 //	@return error
-func (c *Client) QueryAccInfoTotal(ctx context.Context, token string,
+func (c *client) QueryAccInfoTotal(ctx context.Context, token string,
 	accType string) (models.QueryAccinfoTotal, error) {
 	accessToken := token
 	method := "synjones.onecard.query.accinfo.total"
@@ -196,7 +196,7 @@ func (c *Client) QueryAccInfoTotal(ctx context.Context, token string,
 //	@param barcode 二维码
 //	@return models.QuerySnoNameFromBarcode
 //	@return error
-func (c *Client) QuerySnoNameFromBarcode(ctx context.Context, token string,
+func (c *client) QuerySnoNameFromBarcode(ctx context.Context, token string,
 	barcode string) (models.QuerySnoNameFromBarcode, error) {
 	accessToken := token
 	method := "synjones.onecard.query.snoname.frombarcode"
@@ -237,7 +237,7 @@ func (c *Client) QuerySnoNameFromBarcode(ctx context.Context, token string,
 //	@param pwd 校园卡查询密码
 //	@return models.CheckPassword
 //	@return error
-func (c *Client) CheckPassword(ctx context.Context, token string,
+func (c *client) CheckPassword(ctx context.Context, token string,
 	idType, id, pwd string) (models.CheckPassword, error) {
 	accessToken := token
 	method := "synjones.onecard.check.pwd"
@@ -279,7 +279,7 @@ func (c *Client) CheckPassword(ctx context.Context, token string,
 //	@param newPassword 校园卡查询密码 8位数字+字母
 //	@return bool
 //	@return error
-func (c *Client) ModifyPassword(ctx context.Context, token string,
+func (c *client) ModifyPassword(ctx context.Context, token string,
 	account, newPassword string) (bool, error) {
 	accessToken := token
 	method := "synjones.onecard.modify.pwd"
@@ -319,7 +319,7 @@ func (c *Client) ModifyPassword(ctx context.Context, token string,
 //	@param account 一卡通账号
 //	@return bool
 //	@return error
-func (c *Client) LostCard(ctx context.Context, token string,
+func (c *client) LostCard(ctx context.Context, token string,
 	account string) (bool, error) {
 	accessToken := token
 	method := "synjones.onecard.lost.card"
@@ -358,7 +358,7 @@ func (c *Client) LostCard(ctx context.Context, token string,
 //	@param account 一卡通账号
 //	@return bool
 //	@return error
-func (c *Client) UnLostCard(ctx context.Context, token string,
+func (c *client) UnLostCard(ctx context.Context, token string,
 	account string) (bool, error) {
 	accessToken := token
 	method := "synjones.onecard.unlost.card"
@@ -397,7 +397,7 @@ func (c *Client) UnLostCard(ctx context.Context, token string,
 //	@param account 一卡通账号
 //	@return bool
 //	@return error
-func (c *Client) FreezeCard(ctx context.Context, token string,
+func (c *client) FreezeCard(ctx context.Context, token string,
 	account string) (bool, error) {
 	accessToken := token
 	method := "synjones.onecard.frozen.card"
@@ -436,7 +436,7 @@ func (c *Client) FreezeCard(ctx context.Context, token string,
 //	@param account 一卡通账号
 //	@return bool
 //	@return error
-func (c *Client) UnFreezeCard(ctx context.Context, token string,
+func (c *client) UnFreezeCard(ctx context.Context, token string,
 	account string) (bool, error) {
 	accessToken := token
 	method := "synjones.onecard.unfrozen.card"
@@ -479,7 +479,7 @@ func (c *Client) UnFreezeCard(ctx context.Context, token string,
 //	@param nonPwdLimit 免密金额(分)
 //	@return bool
 //	@return error
-func (c *Client) ModifyPayLimit(ctx context.Context, token string,
+func (c *client) ModifyPayLimit(ctx context.Context, token string,
 	account string, accType string, singleLimit int64, dayCostLimit int64, nonPwdLimit int64) (bool, error) {
 	accessToken := token
 	method := " synjones.onecard.paylimite.modify"
@@ -538,7 +538,7 @@ func (c *Client) ModifyPayLimit(ctx context.Context, token string,
 //	@param phone 联系电话
 //	@return account
 //	@return err
-func (c *Client) OpenAcc(ctx context.Context, token string,
+func (c *client) OpenAcc(ctx context.Context, token string,
 	sno, name, idNo, schoolCode, deptCode, cardType, pidCode, inDate, expDate, photoImage, phone string) (account int64, err error) {
 	accessToken := token
 	method := "synjones.onecard.open.acc"
@@ -633,7 +633,7 @@ func (c *Client) OpenAcc(ctx context.Context, token string,
 //	@param payAcc 支付账号 paytype 为1时此字段值可为: ###:为卡账户 其他为电子账户类型 paytype 为 2 时此字段 值可为: 空 paytype为3时此字段 值可为: 银行卡号
 //	@return models.GetBarCode
 //	@return error
-func (c *Client) GetBarCode(ctx context.Context, token string,
+func (c *client) GetBarCode(ctx context.Context, token string,
 	account, payType, payAcc string) (models.GetBarCode, error) {
 	accessToken := token
 	method := "synjones.onecard.barcode.get"
@@ -667,4 +667,44 @@ func (c *Client) GetBarCode(ctx context.Context, token string,
 		return models.GetBarCode{}, errors.New(resp.GetBarCode.Errmsg)
 	}
 	return resp.GetBarCode, nil
+}
+
+func (c *client) ModifyAccInfo(ctx context.Context, token string, account string, accType string, expire string, autoTranLimit, autoTranAmt, autoTranFlag int64) (models.ModifyAccInfo, error) {
+	type ModifyAcc struct {
+		Account        string `json:"account"`
+		AccType        string `json:"acctype"`
+		Expire         string `json:"expire"`
+		AutoTransLimit string `json:"autotrans_limite"`
+		AutoTransAmt   string `json:"autotrans_amt"`
+		AutoTranFlag   string `json:"autotrans_flag"`
+	}
+	type R struct {
+		ModifyAcc `json:"modify_acc"`
+	}
+	r := R{ModifyAcc{
+		Account:        account,
+		AccType:        accType,
+		Expire:         expire,
+		AutoTransLimit: strconv.FormatInt(autoTranLimit, 10),
+		AutoTransAmt:   strconv.FormatInt(autoTranAmt, 10),
+		AutoTranFlag:   strconv.FormatInt(autoTranFlag, 10),
+	}}
+	jsonRequest, err := json.Marshal(r)
+	if err != nil {
+		return models.ModifyAccInfo{}, err
+	}
+	method := "synjones.onecard.modify.acc"
+	response, err := c.DoRequest(ctx, method, token, string(jsonRequest))
+	if err != nil {
+		return models.ModifyAccInfo{}, err
+	}
+	var resp models.ModifyAccInfo
+	err = json.Unmarshal([]byte(response), &resp)
+	if err != nil {
+		return models.ModifyAccInfo{}, err
+	}
+	if resp.ModifyAcc.Retcode != "0" {
+		return models.ModifyAccInfo{}, errors.New(resp.ModifyAcc.Errmsg)
+	}
+	return resp, nil
 }

@@ -22,18 +22,18 @@ func newCipher(tDes string) *dongle.Cipher {
 	return cipher
 }
 
-// EncryptRequestParam 加密 request参数
+// encryptRequestParam 加密 request参数
 // tDes  3des.txt 中数据
 // request 待加密的数据
 // Returns 加密后的数据
-func (c *Client) EncryptRequestParam(request string) string {
+func (c *client) encryptRequestParam(request string) string {
 	return dongle.Encrypt.FromString(request).By3Des(c.cipher).ToBase64String()
 }
 
 //	获取sign参数
 //
 // Returns 加密后的数据
-func (c *Client) EncryptSignParam(access_token, app_key, method, format, signMethod, timestamp, v, request string) (string, error) {
+func (c *client) encryptSignParam(access_token, app_key, method, format, signMethod, timestamp, v, request string) (string, error) {
 	params := map[string]string{
 		"access_token": access_token,
 		"app_key":      app_key,
@@ -66,7 +66,7 @@ func (c *Client) EncryptSignParam(access_token, app_key, method, format, signMet
 	return data, nil
 }
 
-func (c *Client) signatureSign(text, key string) string {
+func (c *client) signatureSign(text, key string) string {
 	block, _ := pem.Decode([]byte(key))
 	if block == nil {
 		return ""
@@ -84,7 +84,7 @@ func (c *Client) signatureSign(text, key string) string {
 	return data
 }
 
-// DecryptRequestParam 解析request参数
-func (c *Client) DecryptRequestParam(request string) string {
+// decryptRequestParam 解析request参数
+func (c *client) decryptRequestParam(request string) string {
 	return dongle.Decrypt.FromBase64String(request).By3Des(c.cipher).ToString()
 }
