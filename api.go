@@ -669,7 +669,7 @@ func (c *client) GetBarCode(ctx context.Context, token string,
 	return resp.GetBarCode, nil
 }
 
-func (c *client) ModifyAccInfo(ctx context.Context, token string, account string, accType string, expire string, autoTranLimit, autoTranAmt, autoTranFlag int64) (models.ModifyAccInfo, error) {
+func (c *client) ModifyAccInfo(ctx context.Context, token string, account, accType, expire, autoTranLimit, autoTranAmt, autoTranFlag string) (models.ModifyAccInfo, error) {
 	type ModifyAcc struct {
 		Account        string `json:"account"`
 		AccType        string `json:"acctype"`
@@ -685,9 +685,9 @@ func (c *client) ModifyAccInfo(ctx context.Context, token string, account string
 		Account:        account,
 		AccType:        accType,
 		Expire:         expire,
-		AutoTransLimit: strconv.FormatInt(autoTranLimit, 10),
-		AutoTransAmt:   strconv.FormatInt(autoTranAmt, 10),
-		AutoTranFlag:   strconv.FormatInt(autoTranFlag, 10),
+		AutoTransLimit: autoTranLimit,
+		AutoTransAmt:   autoTranAmt,
+		AutoTranFlag:   autoTranFlag,
 	}}
 	jsonRequest, err := json.Marshal(r)
 	if err != nil {
