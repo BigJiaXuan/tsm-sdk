@@ -57,12 +57,12 @@ type client struct {
 }
 
 type Config struct {
-	URL        string
-	TDes       string
-	AppKey     string
-	SvrPkcs8   string
-	SvrPrivate string
-	TsmPublic  string
+	URL      string
+	TDes     string
+	AppKey   string
+	SvrPkcs8 string
+	//SvrPrivate string
+	//TsmPublic string
 }
 
 func NewClient(config *Config) Client {
