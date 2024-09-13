@@ -48,7 +48,7 @@ type Client interface {
 	// GetBarCode 获取二维码
 	GetBarCode(ctx context.Context, token string, account, payType, payAcc string) (models.GetBarCode, error)
 	// ModifyAccInfo 校园卡信息变更
-	ModifyAccInfo(ctx context.Context, token string, account string, accType string, expire string, autoTranLimit, autoTranAmt, autoTranFlag int64) (models.ModifyAccInfo, error)
+	ModifyAccInfo(ctx context.Context, token string, account, accType, expire, autoTranLimit, autoTranAmt, autoTranFlag string) (models.ModifyAccInfo, error)
 }
 
 type client struct {
